@@ -14,6 +14,26 @@
         <style>
             #open-media { display: none; }
             @media (max-width: 768px) {
+                #menu:not(.border) {
+                    right: auto;
+                    padding: 4px;
+                    background: transparent;
+                    border-color: transparent;
+                    box-shadow: none;
+                }
+                #menu-open {
+                    width: 44px;
+                    height: 44px;
+                    box-sizing: border-box;
+                    padding: 10px;
+                }
+                #menu-open div {
+                    width: 24px;
+                    height: 3px;
+                    margin-bottom: 5px;
+                    background: #f00;
+                    border: 0;
+                }
                 #background-site:has(#open-media[href^="https://vimeo.com/"]) #open-media {
                     display: block;
                     position: absolute;
@@ -96,6 +116,12 @@
             }
             new MutationObserver(updateMediaLink).observe(mediaFrame, { attributes: true, attributeFilter: ['src'] });
             updateMediaLink();
+            document.getElementById('navigation').addEventListener('click', function (event) {
+                if (event.target.closest('a') && window.matchMedia('(max-width: 768px)').matches) {
+                    this.style.display = '';
+                    document.getElementById('menu').classList.remove('border');
+                }
+            });
         </script>
     </body>
 </html>
