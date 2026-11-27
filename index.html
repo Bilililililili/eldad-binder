@@ -14,6 +14,14 @@
         <style>
 
             @media (max-width: 768px) {
+                #background-site:has(iframe[src*="/document/d/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/"]) {
+                    overflow-x: hidden;
+                }
+                #background-site iframe[src*="/document/d/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/"] {
+                    width: calc(100% / 0.9);
+                    transform: scale(0.9);
+                    transform-origin: top left;
+                }
                 #menu:not(.border) {
                     right: auto;
                     padding: 4px;
