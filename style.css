@@ -4,6 +4,8 @@ Author: Clement Valla
 Version: 1.0
 */
 
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap');
+
 *{
  	margin: 0;
 	padding: 0;
@@ -42,31 +44,19 @@ body {
 	z-index:10;
 	padding: 13px;
 	padding-right: 15px;
-	font: 15px/20px monospace;
+	font: 400 15px/20px Assistant, Arial, sans-serif;
     letter-spacing: -0.3px;
 	cursor: move;
-	    box-shadow: #fefb00 3px 3px 0, 6px 6px 0px #ff0000;
+	box-shadow: #fff 3px 3px 0, 6px 6px 0 #ff0000;
 	border-style: solid;
-	border-color: blue;
+	border-color: #ff0000;
 	background-color: #eee;
 }
 
-#logo {
-	z-index: 20;
-	position: fixed;
-	right: 70px;
-	top: 60px;
-	width: 300px;
+#logo,
+#logo-touch {
+	display: none;
 }
-    #logo-touch {
-        display: none;
-		position: absolute;
-		left:50%;
-		top:4px;
-		margin-left: -80px;
-		width:160px;
-		margin: left:10%;
-    }
 
 #binder-clip{
 	margin-top: -38px;
@@ -96,14 +86,14 @@ body {
 	text-decoration: none;
 	padding: 1px;
 }
-#navigation a.active{
-	color: #000;
+#navigation a {
+	color: #ff0000;
 }
-#navigation a:hover{
-	color: #000;
+#navigation a.active {
+	font-weight: 700;
 }
-#navigation .current_page_item a {
-	color: red;
+#navigation a:hover {
+	text-decoration: underline;
 }
 
 .about{
@@ -132,12 +122,6 @@ body {
         top: 2px;
     }
 
-	.touch-device #logo{
-        display: none;
-	}
-	.touch-device #logo-touch{
-        display: block;
-    }
 	.touch-device #navigation{
 		display: none;
 		text-indent: -1.5em;
@@ -186,12 +170,6 @@ body {
         right: 2px;
 		top: 2px;
 	}
-	#logo{
-        display: none;
-	}
-    #logo-touch {
-        display: block;
-    }
 	#navigation{
 		display: none;
 		text-indent: -1.5em;
