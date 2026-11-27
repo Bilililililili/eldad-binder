@@ -14,10 +14,10 @@
         <style>
 
             @media (max-width: 768px) {
-                #background-site:has(iframe[src*="/document/d/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/"]) {
+                #background-site:has(iframe[src^="https://docs.google.com/document/"]) {
                     overflow-x: hidden;
                 }
-                #background-site iframe[src*="/document/d/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/"] {
+                #background-site iframe[src^="https://docs.google.com/document/"] {
                     width: calc(100% / 0.9);
                     transform: scale(0.9);
                     transform-origin: top left;
