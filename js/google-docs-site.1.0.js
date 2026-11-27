@@ -76,7 +76,9 @@ function locationHashChanged() {
 	item = decodeURI(item);//thanks Eran! 
 	$('li a').removeClass('active');
 
-	if (siteData.menu.hasOwnProperty(item)){
+	if (item === 'wikipedia') {
+        $('#backgrnd').attr('src', 'https://he.wikipedia.org/wiki/%D7%90%D7%9C%D7%93%D7%93_%D7%A4%D7%A8%D7%99%D7%91%D7%A1');
+    } else if (siteData.menu.hasOwnProperty(item)){
 		$('#backgrnd').attr('src', siteData.menu[item]);
 		var urlsafe = item.replace(/ /gi, '-');
 		$('.'+urlsafe+' a').addClass('active');
