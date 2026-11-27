@@ -14,6 +14,13 @@
         <style>
 
             @media (max-width: 768px) {
+                #background-site iframe[src^="https://script.google.com/macros/s/"] {
+                    position: absolute;
+                    inset: 60px 0 auto;
+                    display: block;
+                    height: calc(100vh - 60px);
+                    height: calc(100dvh - 60px);
+                }
                 #background-site:has(iframe[src^="https://docs.google.com/document/"]) {
                     overflow-x: hidden;
                 }
