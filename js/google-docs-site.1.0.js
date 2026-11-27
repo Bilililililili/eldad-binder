@@ -2,24 +2,24 @@ var siteData;
 
 const managementSheet = 'https://docs.google.com/spreadsheets/d/1PXbL9Ucf8s4-4seusrccddy33aeo8y5YmQ7WQ2nydjc/gviz/tq';
 
-function readManagementRows(gid) {
-    return new Promise((resolve, reject) => {
-        const callback = 'binderSheet' + gid;
-        $.ajax({
-            url: managementSheet,
-            data: { gid, headers: 1, tq: 'select A,B,C,D,E', tqx: 'out:json;responseHandler:' + callback },
-            dataType: 'jsonp',
-            jsonp: false,
-            jsonpCallback: callback,
-            timeout: 4500
-        }).done(result => {
-            if (result.status !== 'ok' || !Array.isArray(result.table?.rows)) {
-                reject(new Error('Invalid management sheet response'));
-                return;
-            }
-            resolve(result.table.rows.map(row => row.c.map(cell => String(cell?.v ?? '').trim())));
-        }).fail(reject);
-    });
+async function readManagementRows(gid) {
+    const url = new URL(managementSheet);
+    const callback = 'binderSheet';
+    url.search = new URLSearchParams({ gid, headers: 1, tq: 'select A,B,C,D,E', tqx: 'out:json;responseHandler:' + callback });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    try {
+        const response = await fetch(url, { credentials: 'omit', signal: controller.signal, cache: 'no-store' });
+        if (!response.ok) throw new Error('Management sheet unavailable');
+        const body = (await response.text()).trim();
+        const prefix = '/*O_o*/\n' + callback + '(';
+        if (!body.startsWith(prefix) || !body.endsWith(');')) throw new Error('Invalid management sheet format');
+        const result = JSON.parse(body.slice(prefix.length, -2));
+        if (result.status !== 'ok' || !Array.isArray(result.table?.rows)) throw new Error('Invalid management rows');
+        return result.table.rows.map(row => row.c.map(cell => String(cell?.v ?? '').trim()));
+    } finally {
+        clearTimeout(timeout);
+    }
 }
 
 function embedUrl(source) {
