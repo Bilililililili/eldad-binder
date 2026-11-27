@@ -14,7 +14,7 @@
         <style>
             #open-media { display: none; }
             @media (max-width: 768px) {
-                #background-site:has(#open-media[href]) #open-media {
+                #background-site:has(#open-media[href^="https://vimeo.com/"]) #open-media {
                     display: block;
                     position: absolute;
                     inset: 68px 12px auto;
@@ -31,6 +31,11 @@
                     inset: 112px 0 auto;
                     height: min(calc(56.25vw + 40px), calc(100vh - 112px));
                     height: min(calc(56.25vw + 40px), calc(100dvh - 112px));
+                }
+                #background-site:has(#open-media[href^="https://docs.google.com/"]) iframe {
+                    top: 68px;
+                    height: min(calc(56.25vw + 40px), calc(100vh - 68px));
+                    height: min(calc(56.25vw + 40px), calc(100dvh - 68px));
                 }
             }
         </style>
