@@ -135,7 +135,7 @@
                 if (options.url === 'info.json') options.cache = false;
             });
         </script>
-        <script src="js/google-docs-site.1.0.js?v=documentary-films"></script>
+        <script src="js/google-docs-site.1.0.js?v=sheet-menu"></script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <script>
@@ -149,8 +149,8 @@
         <script>
             const navigation = document.getElementById('navigation');
             const mobileNavigation = window.matchMedia('(max-width: 768px), (pointer: coarse)');
-            const clownPage = 'הליצן איקס';
-            const clownChildren = ['ממלכת שן הזהב התיכונה', 'הקונסוליה', 'יחידת ה104', 'שואו ריל הליצן איקס'];
+            let clownPage = 'הליצן איקס';
+            let clownChildren = ['ממלכת שן הזהב התיכונה', 'הקונסוליה', 'יחידת ה104', 'שואו ריל הליצן איקס'];
             let clownSubmenu;
             let clownToggle;
 
@@ -162,6 +162,10 @@
             }
 
             function addClownSubmenu() {
+                if (typeof siteData !== 'undefined' && siteData?.clownChildren) {
+                    clownChildren = siteData.clownChildren;
+                    clownPage = siteData.labels['הליצן איקס'] || clownPage;
+                }
                 const items = new Map(Array.from(navigation.children, item => [item.textContent.trim(), item]));
                 const parentItem = items.get(clownPage);
                 if (!parentItem || !clownChildren.every(label => items.has(label))) return;
