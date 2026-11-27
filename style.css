@@ -195,3 +195,16 @@ body {
 	}
 }
 /* @end */
+
+
+/* Keep slide and video players within the visible mobile screen. */
+@media (max-width: 768px) {
+    #background-site iframe[src^="https://docs.google.com/presentation/"],
+    #background-site iframe[src^="https://player.vimeo.com/video/"] {
+        position: absolute;
+        inset: 64px 0 0;
+        display: block;
+        height: calc(100% - 64px);
+        height: calc(100dvh - 64px);
+    }
+}
