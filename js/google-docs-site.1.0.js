@@ -73,13 +73,13 @@ async function applyManagementSheet(fallback) {
 $(function() {
 
 	//load the json
-	$.get( "info.json", async function( data ) {
+	$.get( "info.json", function( data ) {
 
 		//did it load json data as string or as an object?
 		if (typeof data == "string")
 			data = $.parseJSON(data);
 
-		data = await applyManagementSheet(data);
+		applyManagementSheet(data).then(function (data) {
 		siteData = data;
 
 		//create the title
@@ -107,6 +107,7 @@ $(function() {
 
 		$("#menu").draggable({ cancel: "li" });
     	// $( "div, p" ).disableSelection();
+        });
 	});
 
     // Keep navigation from getting borked when dragged on wider views
