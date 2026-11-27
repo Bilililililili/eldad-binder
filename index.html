@@ -148,6 +148,7 @@
         </script>
         <script>
             const navigation = document.getElementById('navigation');
+            const mobileNavigation = window.matchMedia('(max-width: 768px), (pointer: coarse)');
             const clownPage = 'הליצן איקס';
             const clownChildren = ['ממלכת שן הזהב התיכונה', 'הקונסוליה', 'יחידת ה104', 'שואו ריל הליצן איקס'];
             let clownSubmenu;
@@ -186,12 +187,16 @@
                 });
                 parentItem.appendChild(clownToggle);
                 const page = decodeURIComponent(location.hash.slice(1));
-                setClownSubmenu(page === clownPage || clownChildren.includes(page));
+                setClownSubmenu(!mobileNavigation.matches && (page === clownPage || clownChildren.includes(page)));
             }
 
             const menuObserver = new MutationObserver(addClownSubmenu);
             menuObserver.observe(navigation, { childList: true });
             addClownSubmenu();
+
+            document.getElementById('menu-open').addEventListener('click', () => {
+                if (mobileNavigation.matches && clownSubmenu) setClownSubmenu(false);
+            });
 
             navigation.addEventListener('click', function (event) {
                 const link = event.target.closest('a');
