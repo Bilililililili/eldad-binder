@@ -77,6 +77,11 @@
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="js/vendor/jquery.ui.touch-punch.min.js"></script>
+        <script>
+            jQuery.ajaxPrefilter(function (options) {
+                if (options.url === 'info.json') options.cache = false;
+            });
+        </script>
         <script src="js/google-docs-site.1.0.js?v=agency"></script>
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
