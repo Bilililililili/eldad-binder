@@ -15,22 +15,11 @@
 
             @media (max-width: 768px) {
                 #background-site:has(iframe[src^="https://docs.google.com/document/"]) {
-                    overflow-x: auto;
-                    direction: rtl;
-                }
-                #background-site:has(iframe[src^="https://docs.google.com/document/"]) .docs-frame {
-                    display: block;
-                    position: relative;
-                    width: var(--docs-render-width, 100%);
-                    height: var(--docs-render-height, 5500px);
-                    overflow: hidden;
-                    direction: ltr;
+                    overflow-x: hidden;
                 }
                 #background-site iframe[src^="https://docs.google.com/document/"] {
-                    position: absolute;
-                    inset: 0 auto auto 0;
-                    width: var(--docs-layout-width, calc(100% / 0.85));
-                    transform: scale(var(--docs-fit-scale, 0.85));
+                    width: calc(100% / 0.85);
+                    transform: scale(0.85);
                     transform-origin: top left;
                 }
                 #menu:not(.border),
@@ -114,29 +103,6 @@
                 #menu #navigation .clown-submenu a { padding-right: 8px; }
                 #clown-submenu-toggle { min-width: 44px; min-height: 44px; }
             }
-            .docs-frame { display: contents; }
-            #docs-scroll { display: none; }
-            @media (max-width: 768px) {
-                #docs-scroll:not([hidden]) {
-                    position: fixed;
-                    z-index: 9;
-                    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-                    left: 50%;
-                    transform: translateX(-50%);
-                    display: flex;
-                    align-items: center;
-                    gap: .5rem;
-                    min-height: 44px;
-                    padding: 5px 14px;
-                    border: 2px solid #be1d21;
-                    border-radius: 24px;
-                    background: #fff;
-                    color: #be1d21;
-                    cursor: pointer;
-                    font: 700 16px/1.2 Assistant, Arial, sans-serif;
-                    white-space: nowrap;
-                }
-            }
         </style>
     </head>
     <body>
@@ -158,9 +124,8 @@
             </ul>
         </div>
 
-        <div id="background-site"><div class="docs-frame"><iframe name="backgrnd" id="backgrnd" scrolling="yes" src="https://docs.google.com/document/d/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/preview" allowfullscreen></iframe></div></div>
+        <div id="background-site"><iframe name="backgrnd" id="backgrnd" scrolling="yes" src="https://docs.google.com/document/d/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/preview" allowfullscreen></iframe></div>
 
-        <button id="docs-scroll" type="button" dir="rtl" aria-controls="background-site" hidden>גלילה לרוחב <span aria-hidden="true">←</span></button>
         <script>
             (function () {
                 const fallback = {"title":"אלדד","logo":"logo.png","about":"","menu":{"אלדד פריבס":"https://docs.google.com/document/d/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/preview","סדנאות":"https://docs.google.com/document/d/1O8Nr1SQ75L4Yb9sfUB74s_Wzvw4tbGr7D7T-tfVcU0o/preview","הוראה בימוי וכתיבה":"https://docs.google.com/document/d/197cpoAgaaKCuFmlGimBZWLrO5M2XWRJATNyhqHfS5Cc/preview","יעוץ אומנותי":"https://docs.google.com/document/d/1Ihone-OIxl8RSKj45YPx7zDCUA6opI2agoOlh-hQZKg/preview","קולנוע דוקומנטרי":"https://docs.google.com/document/d/1n0Q4A-WHpqcx7ygkSvQ-dCSjOnoywbGamdNK1H5rD8M/preview","הליצן איקס":"https://www.clownx.org/","ממלכת שן הזהב התיכונה":"https://www.clownx.org/golden-tooth-kingdom","הקונסוליה":"https://player.vimeo.com/video/1055895954","יחידת ה104":"https://www.kipodhazahav.co.il/he/112/269","שואו ריל הליצן איקס":"https://player.vimeo.com/video/745312686"}};
@@ -176,25 +141,6 @@
                 const menuButton = document.getElementById('menu-open');
                 const nav = document.getElementById('navigation');
                 const frame = document.getElementById('backgrnd');
-                const scroller = document.getElementById('background-site');
-                const scrollHint = document.getElementById('docs-scroll');
-                const scrollArrow = scrollHint.querySelector('span');
-
-                function updateScrollHint() {
-                    const overflow = scroller.scrollWidth - scroller.clientWidth;
-                    const isDoc = (frame.getAttribute('src') || '').startsWith('https://docs.google.com/document/');
-                    scrollHint.hidden = !isDoc || scroller.clientWidth > 768 || overflow < 2;
-                    const atEnd = Math.abs(scroller.scrollLeft) >= overflow - 2;
-                    scrollArrow.textContent = atEnd ? '→' : '←';
-                    scrollHint.setAttribute('aria-label', atEnd ? 'חזרה לצד הימני של המסמך' : 'גלילה לצד השמאלי של המסמך');
-                }
-
-                scrollHint.addEventListener('click', () => {
-                    const overflow = scroller.scrollWidth - scroller.clientWidth;
-                    const left = Math.abs(scroller.scrollLeft) >= overflow - 2 ? 0 : -overflow;
-                    scroller.scrollTo({ left, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-                });
-                scroller.addEventListener('scroll', updateScrollHint, { passive: true });
                 const mobile = matchMedia('(max-width: 768px), (pointer: coarse)');
                 let current;
                 let submenu;
@@ -220,34 +166,11 @@
                     if (!open) setSubmenu(false);
                 }
 
-                function fitDocument() {
-                    const source = frame.getAttribute('src') || '';
-                    if (!source.startsWith('https://docs.google.com/document/')) {
-                        updateScrollHint();
-                        return;
-                    }
-                    const available = document.documentElement.clientWidth;
-                    const home = source.includes('/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/');
-                    const documentary = source.includes('/1n0Q4A-WHpqcx7ygkSvQ-dCSjOnoywbGamdNK1H5rD8M/');
-                    const minimum = home ? 530 : documentary ? 1080 : 840;
-                    const layoutWidth = Math.max(minimum, Math.ceil(available / 0.85));
-                    frame.style.setProperty('--docs-layout-width', layoutWidth + 'px');
-                    const scale = Math.max(0.72, available / layoutWidth);
-                    frame.style.setProperty('--docs-fit-scale', scale);
-                    frame.parentElement.style.setProperty('--docs-render-width', Math.ceil(layoutWidth * scale) + 'px');
-                    frame.parentElement.style.setProperty('--docs-render-height', Math.ceil(5500 * scale) + 'px');
-                    updateScrollHint();
-                }
-
                 function showPage() {
                     const page = selected();
                     const key = current.routes.has(page) ? page : current.home;
                     const src = current.routes.get(key);
-                    if (frame.getAttribute('src') !== src) {
-                        frame.setAttribute('src', src);
-                        frame.parentElement.parentElement.scrollTo(0, 0);
-                    }
-                    fitDocument();
+                    if (frame.getAttribute('src') !== src) frame.setAttribute('src', src);
                     nav.querySelectorAll('a[data-key]').forEach(link => link.classList.toggle('active', link.dataset.key === key));
                 }
 
@@ -371,7 +294,6 @@
                 });
                 window.addEventListener('hashchange', showPage);
                 window.addEventListener('resize', () => {
-                    fitDocument();
                     if (mobile.matches) menu.style.cssText = '';
                     if (!mobile.matches) setMenu(false);
                 });
