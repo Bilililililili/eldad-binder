@@ -22,8 +22,34 @@
                     transform: scale(0.85);
                     transform-origin: top left;
                 }
+                #menu:not(.border),
+                #menu.border {
+                    left: auto;
+                    right: 6px;
+                    top: 6px;
+                    box-sizing: border-box;
+                    cursor: default;
+                }
+                #menu.border {
+                    width: min(18rem, calc(100vw - 18px));
+                    max-height: calc(100vh - 18px);
+                    max-height: calc(100dvh - 18px);
+                    overflow-y: auto;
+                    background: #fff;
+                }
+                #menu #navigation {
+                    direction: rtl;
+                    text-align: right;
+                    text-indent: 0;
+                    margin: 0;
+                }
+                #menu #navigation a {
+                    display: block;
+                    padding: 7px 8px;
+                    font-size: 17px;
+                    line-height: 1.3;
+                }
                 #menu:not(.border) {
-                    right: auto;
                     padding: 4px;
                     background: transparent;
                     border-color: transparent;
