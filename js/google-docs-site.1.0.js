@@ -1,14 +1,85 @@
 var siteData;
 
+const managementSheet = 'https://docs.google.com/spreadsheets/d/1PXbL9Ucf8s4-4seusrccddy33aeo8y5YmQ7WQ2nydjc/gviz/tq';
+
+function readManagementRows(gid) {
+    return new Promise((resolve, reject) => {
+        const callback = 'binderSheet' + gid;
+        $.ajax({
+            url: managementSheet,
+            data: { gid, headers: 1, tq: 'select A,B,C,D,E', tqx: 'out:json;responseHandler:' + callback },
+            dataType: 'jsonp',
+            jsonp: false,
+            jsonpCallback: callback,
+            timeout: 4500
+        }).done(result => {
+            if (result.status !== 'ok' || !Array.isArray(result.table?.rows)) {
+                reject(new Error('Invalid management sheet response'));
+                return;
+            }
+            resolve(result.table.rows.map(row => row.c.map(cell => String(cell?.v ?? '').trim())));
+        }).fail(reject);
+    });
+}
+
+function embedUrl(source) {
+    const url = new URL(source);
+    if (url.protocol !== 'https:' || url.username || url.password) throw new Error('Use an HTTPS source');
+    if (url.hostname === 'docs.google.com') {
+        const doc = url.pathname.match(/^\/document\/d\/([\w-]+)/);
+        const slides = url.pathname.match(/^\/presentation\/d\/([\w-]+)/);
+        if (doc) return url.origin + '/document/d/' + doc[1] + '/preview';
+        if (slides) return url.origin + '/presentation/d/' + slides[1] + '/embed?start=false';
+    }
+    if (url.hostname === 'vimeo.com' && /^\/\d+\/?$/.test(url.pathname)) {
+        return 'https://player.vimeo.com/video/' + url.pathname.split('/')[1];
+    }
+    if (url.origin === window.location.origin) throw new Error('Use the original source address');
+    return url.href;
+}
+
+async function applyManagementSheet(fallback) {
+    try {
+        const [visible, hidden] = await Promise.all([readManagementRows('1663950710'), readManagementRows('729104220')]);
+        const menu = Object.create(null);
+        const routes = Object.create(null);
+        const labels = Object.create(null);
+        const usedNames = new Set();
+        const clownChildren = [];
+        let home;
+        for (const [name, source, group, type, key] of [...visible, ...hidden]) {
+            if (!name || !source || !key || Object.hasOwn(routes, key)) continue;
+            let target;
+            try { target = embedUrl(source); } catch (_) { continue; }
+            const inMenu = group === 'תפריט ראשי' || group === 'תחת הליצן איקס';
+            if (inMenu && usedNames.has(name)) continue;
+            routes[key] = target;
+            if (!inMenu) continue;
+            usedNames.add(name);
+            menu[key] = target;
+            labels[key] = name;
+            if (group === 'תחת הליצן איקס') clownChildren.push(name);
+            if (type === 'ראשי' && group === 'תפריט ראשי') home = key;
+        }
+        if (!home || !Object.hasOwn(menu, 'הליצן איקס')) return fallback;
+        return { ...fallback, menu, routes, labels, home, clownChildren };
+    } catch (_) {
+        return fallback;
+    }
+}
+
+
+
 $(function() {
 
 	//load the json
-	$.get( "info.json", function( data ) {
+	$.get( "info.json", async function( data ) {
 
 		//did it load json data as string or as an object?
 		if (typeof data == "string")
 			data = $.parseJSON(data);
 
+		data = await applyManagementSheet(data);
 		siteData = data;
 
 		//create the title
@@ -16,17 +87,11 @@ $(function() {
 		
 		//create the navigation
 		var links = $('#navigation');
-		for (var property in data.menu) {
-    		if (data.menu.hasOwnProperty(property)) {
-    			var urlsafe = property.replace(/ /gi, '-');
-        		var item = $('<li class="menu-item">');
-        		item.addClass(urlsafe);
-        		item.html('<a href="#'+ property +'">'+property+'</a>');
-        		item.appendTo(links);
-        		//tmp
-        		var bk = data.menu[property];
-    		}
-		}
+		Object.keys(data.menu).forEach(function (key) {
+            const label = data.labels?.[key] || key;
+            const link = $('<a>').attr('href', '#' + encodeURIComponent(key)).text(label);
+            $('<li class="menu-item">').append(link).appendTo(links);
+        });
 
 		//create the about section
 		var about = $('.about');
@@ -76,7 +141,10 @@ function locationHashChanged() {
 	item = decodeURI(item);//thanks Eran! 
 	$('li a').removeClass('active');
 
-	if (item === 'wikipedia') {
+	if (siteData.routes && Object.hasOwn(siteData.routes, item)) {
+        $('#backgrnd').attr('src', siteData.routes[item]);
+        markMenuItem(item);
+    } else if (item === 'wikipedia') {
         $('#backgrnd').attr('src', 'https://he.wikipedia.org/wiki/%D7%90%D7%9C%D7%93%D7%93_%D7%A4%D7%A8%D7%99%D7%91%D7%A1');
     } else if (item === 'agency') {
         $('#backgrnd').attr('src', 'https://www.zohar-agency.com/actor/%D7%90%D7%9C%D7%93%D7%93-%D7%A4%D7%A8%D7%99%D7%91%D7%A1/');
@@ -86,14 +154,21 @@ function locationHashChanged() {
         $('#backgrnd').attr('src', 'https://www.cultureunplugged.com/documentary/watch-online/play/9611/red-nose');
     } else if (siteData.menu.hasOwnProperty(item)){
 		$('#backgrnd').attr('src', siteData.menu[item]);
-		var urlsafe = item.replace(/ /gi, '-');
-		$('.'+urlsafe+' a').addClass('active');
+		markMenuItem(item);
 	} else {
 		//load the first one
-		$('#backgrnd').attr('src', siteData.menu[Object.keys(siteData.menu)[0]]);
-		var urlsafe = item.replace(/ /gi, '-');
-		$('li a').first().addClass('active');
+		const home = siteData.home || Object.keys(siteData.menu)[0];
+        $('#backgrnd').attr('src', siteData.menu[home]);
+        markMenuItem(home);
 	}
 }
 
-window.onhashchange = locationHashChanged;
+function markMenuItem(key) {
+    $('#navigation a').filter(function () {
+        return this.getAttribute('href') === '#' + encodeURIComponent(key);
+    }).addClass('active');
+}
+
+window.onhashchange = function () {
+    if (siteData) locationHashChanged();
+};
