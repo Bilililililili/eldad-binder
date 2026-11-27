@@ -11,6 +11,29 @@
         <link rel="stylesheet" href="style.css">
 
         <script src="js/vendor/modernizr-2.8.3.min.js"></script>
+        <style>
+            #open-media { display: none; }
+            @media (max-width: 768px) {
+                #background-site:has(#open-media[href]) #open-media {
+                    display: block;
+                    position: absolute;
+                    inset: 68px 12px auto;
+                    min-height: 44px;
+                    padding: 8px;
+                    box-sizing: border-box;
+                    text-align: center;
+                    color: #ba1717;
+                    background: #fff;
+                    font: 700 17px/28px Assistant, Arial, sans-serif;
+                }
+                #background-site:has(#open-media[href]) iframe {
+                    position: absolute;
+                    inset: 112px 0 auto;
+                    height: min(calc(56.25vw + 40px), calc(100vh - 112px));
+                    height: min(calc(56.25vw + 40px), calc(100dvh - 112px));
+                }
+            }
+        </style>
     </head>
     <body>
         <!--[if lt IE 8]>
@@ -31,7 +54,7 @@
             </ul>
         </div>
 
-        <div id="background-site"><iframe name="backgrnd" id="backgrnd" scrolling="yes" src=""></iframe></div>
+        <div id="background-site"><a id="open-media" target="_blank" rel="noopener" lang="he" dir="rtl"></a><iframe name="backgrnd" id="backgrnd" scrolling="yes" src="" allowfullscreen></iframe></div>
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
@@ -47,6 +70,27 @@
             e.src='//www.google-analytics.com/analytics.js';
             r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
             ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+        <script>
+            const mediaFrame = document.getElementById('backgrnd');
+            const mediaLink = document.getElementById('open-media');
+            function updateMediaLink() {
+                const src = mediaFrame.getAttribute('src') || '';
+                const slides = /^https:\/\/docs\.google\.com\/presentation\/d\/([^/]+)/.exec(src);
+                const video = /^https:\/\/player\.vimeo\.com\/video\/(\d+)$/.exec(src);
+                if (slides) {
+                    mediaLink.href = 'https://docs.google.com/presentation/d/' + slides[1] + '/present';
+                    mediaLink.textContent = 'פתיחת המצגת בחלון חדש';
+                } else if (video) {
+                    mediaLink.href = 'https://vimeo.com/' + video[1];
+                    mediaLink.textContent = 'צפייה בסרטון ב־Vimeo';
+                } else {
+                    mediaLink.removeAttribute('href');
+                    mediaLink.textContent = '';
+                }
+            }
+            new MutationObserver(updateMediaLink).observe(mediaFrame, { attributes: true, attributeFilter: ['src'] });
+            updateMediaLink();
         </script>
     </body>
 </html>
