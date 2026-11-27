@@ -18,8 +18,8 @@
                     overflow-x: hidden;
                 }
                 #background-site iframe[src^="https://docs.google.com/document/"] {
-                    width: calc(100% / 0.85);
-                    transform: scale(0.85);
+                    width: var(--docs-layout-width, calc(100% / 0.85));
+                    transform: scale(var(--docs-fit-scale, 0.85));
                     transform-origin: top left;
                 }
                 #menu:not(.border),
@@ -166,11 +166,24 @@
                     if (!open) setSubmenu(false);
                 }
 
+                function fitDocument() {
+                    const source = frame.getAttribute('src') || '';
+                    if (!source.startsWith('https://docs.google.com/document/')) return;
+                    const available = document.documentElement.clientWidth;
+                    const home = source.includes('/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/');
+                    const documentary = source.includes('/1n0Q4A-WHpqcx7ygkSvQ-dCSjOnoywbGamdNK1H5rD8M/');
+                    const minimum = home ? 680 : documentary ? 1080 : 840;
+                    const layoutWidth = Math.max(minimum, Math.ceil(available / 0.85));
+                    frame.style.setProperty('--docs-layout-width', layoutWidth + 'px');
+                    frame.style.setProperty('--docs-fit-scale', available / layoutWidth);
+                }
+
                 function showPage() {
                     const page = selected();
                     const key = current.routes.has(page) ? page : current.home;
                     const src = current.routes.get(key);
                     if (frame.getAttribute('src') !== src) frame.setAttribute('src', src);
+                    fitDocument();
                     nav.querySelectorAll('a[data-key]').forEach(link => link.classList.toggle('active', link.dataset.key === key));
                 }
 
@@ -294,6 +307,7 @@
                 });
                 window.addEventListener('hashchange', showPage);
                 window.addEventListener('resize', () => {
+                    fitDocument();
                     if (mobile.matches) menu.style.cssText = '';
                     if (!mobile.matches) setMenu(false);
                 });
