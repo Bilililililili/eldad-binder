@@ -1,15 +1,16 @@
 {
-	"title": "Binder",
-	"logo" : "logo.png",
-	"about" : "Link some sites together.",
-	"menu" : {
-		"About" : "https://docs.google.com/document/d/1L8uIUdE58AsP-jnHD_H6df3T2DNFsegImPidkTwpYLw/",
-		"Download" : "https://docs.google.com/document/d/1aKVEphpLq3UUBkhoStJVhmkiOWRQmALAj-bphbk-KTU/",
-		"Binder In-Use" : "https://docs.google.com/document/d/1q9957u3P0SfFzwTzaWlu1ZeJ4FEZ0H4MF-cJBSm4Y-s/",
-		"Google Slides" : "https://docs.google.com/presentation/d/1gdX17MpgdyhiAQKTPehMWEYf914cYF4GtuY7m1jD7Qo/embed?start=true&loop=true&delayms=5000",
-		"Tumblr" : "http://cempontraoryartdaily.tumblr.com/",
-		"PDF" : "http://www.nasa.gov/pdf/373665main_NASA-SP-2009-566.pdf",
-		"Youtube" : "https://www.youtube.com/embed/Sdi2S1PHS_s",
-		"Wikipedia" : "https://en.wikipedia.org/wiki/Web_page"
-	}
+  "title": "אלדד",
+  "logo": "logo.png",
+  "about": "",
+  "menu": {
+    "דף הבית": "https://docs.google.com/presentation/d/1URr00s9SZvdtOtZST0--XbnoZcts4jTntv_2kndYnmI/embed?start=false",
+    "יעוץ אומנותי": "https://docs.google.com/document/d/1Ihone-OIxl8RSKj45YPx7zDCUA6opI2agoOlh-hQZKg/preview",
+    "הוראה בימוי וכתיבה": "https://docs.google.com/document/d/197cpoAgaaKCuFmlGimBZWLrO5M2XWRJATNyhqHfS5Cc/preview",
+    "סדנאות": "https://docs.google.com/presentation/d/17bn3GiEjoXjypuFID1SHh01kHGB4PQo0CgtnZBJeCEE/embed?start=false",
+    "הליצן איקס": "https://www.clownx.org/",
+    "ממלכת שן הזהב התיכונה": "https://www.clownx.org/golden-tooth-kingdom",
+    "הקונסוליה": "https://player.vimeo.com/video/1055895954",
+    "יחידת ה104": "https://www.kipodhazahav.co.il/he/112/269",
+    "שואו ריל הליצן איקס": "https://player.vimeo.com/video/745312686"
+  }
 }
