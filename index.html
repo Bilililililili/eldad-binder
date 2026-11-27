@@ -15,9 +15,20 @@
 
             @media (max-width: 768px) {
                 #background-site:has(iframe[src^="https://docs.google.com/document/"]) {
-                    overflow-x: hidden;
+                    overflow-x: auto;
+                    direction: rtl;
+                }
+                #background-site:has(iframe[src^="https://docs.google.com/document/"]) .docs-frame {
+                    display: block;
+                    position: relative;
+                    width: var(--docs-render-width, 100%);
+                    height: var(--docs-render-height, 5500px);
+                    overflow: hidden;
+                    direction: ltr;
                 }
                 #background-site iframe[src^="https://docs.google.com/document/"] {
+                    position: absolute;
+                    inset: 0 auto auto 0;
                     width: var(--docs-layout-width, calc(100% / 0.85));
                     transform: scale(var(--docs-fit-scale, 0.85));
                     transform-origin: top left;
@@ -103,6 +114,7 @@
                 #menu #navigation .clown-submenu a { padding-right: 8px; }
                 #clown-submenu-toggle { min-width: 44px; min-height: 44px; }
             }
+            .docs-frame { display: contents; }
         </style>
     </head>
     <body>
@@ -124,7 +136,7 @@
             </ul>
         </div>
 
-        <div id="background-site"><iframe name="backgrnd" id="backgrnd" scrolling="yes" src="https://docs.google.com/document/d/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/preview" allowfullscreen></iframe></div>
+        <div id="background-site"><div class="docs-frame"><iframe name="backgrnd" id="backgrnd" scrolling="yes" src="https://docs.google.com/document/d/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/preview" allowfullscreen></iframe></div></div>
 
         <script>
             (function () {
@@ -172,17 +184,23 @@
                     const available = document.documentElement.clientWidth;
                     const home = source.includes('/1m0et2yGFUoDVUjCCnqdZgVwPyfdmjhFwtf1p2NPjK2w/');
                     const documentary = source.includes('/1n0Q4A-WHpqcx7ygkSvQ-dCSjOnoywbGamdNK1H5rD8M/');
-                    const minimum = home ? 680 : documentary ? 1080 : 840;
+                    const minimum = home ? 530 : documentary ? 1080 : 840;
                     const layoutWidth = Math.max(minimum, Math.ceil(available / 0.85));
                     frame.style.setProperty('--docs-layout-width', layoutWidth + 'px');
-                    frame.style.setProperty('--docs-fit-scale', available / layoutWidth);
+                    const scale = Math.max(0.72, available / layoutWidth);
+                    frame.style.setProperty('--docs-fit-scale', scale);
+                    frame.parentElement.style.setProperty('--docs-render-width', Math.ceil(layoutWidth * scale) + 'px');
+                    frame.parentElement.style.setProperty('--docs-render-height', Math.ceil(5500 * scale) + 'px');
                 }
 
                 function showPage() {
                     const page = selected();
                     const key = current.routes.has(page) ? page : current.home;
                     const src = current.routes.get(key);
-                    if (frame.getAttribute('src') !== src) frame.setAttribute('src', src);
+                    if (frame.getAttribute('src') !== src) {
+                        frame.setAttribute('src', src);
+                        frame.parentElement.parentElement.scrollTo(0, 0);
+                    }
                     fitDocument();
                     nav.querySelectorAll('a[data-key]').forEach(link => link.classList.toggle('active', link.dataset.key === key));
                 }
