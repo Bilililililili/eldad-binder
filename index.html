@@ -177,7 +177,13 @@
                 clownToggle.type = 'button';
                 clownToggle.id = 'clown-submenu-toggle';
                 clownToggle.setAttribute('aria-controls', clownSubmenu.id);
-                clownToggle.addEventListener('click', () => setClownSubmenu(clownSubmenu.hidden));
+                clownToggle.addEventListener('click', () => {
+                    if (clownSubmenu.hidden) {
+                        parentItem.querySelector('a').click();
+                    } else {
+                        setClownSubmenu(false);
+                    }
+                });
                 parentItem.appendChild(clownToggle);
                 const page = decodeURIComponent(location.hash.slice(1));
                 setClownSubmenu(page === clownPage || clownChildren.includes(page));
