@@ -76,6 +76,33 @@
                     height: min(calc(56.25vw + 40px), calc(100dvh - 68px));
                 }
             }
+            #navigation .clown-group-heading {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: .5rem;
+            }
+            #navigation .clown-submenu {
+                list-style: none;
+                margin: 0 0 0 1rem;
+                padding: 0;
+            }
+            #navigation .clown-submenu[hidden] { display: none; }
+            #clown-submenu-toggle {
+                background: none;
+                border: 0;
+                color: #f00;
+                cursor: pointer;
+                font: 700 1.2rem/1 Assistant, Arial, sans-serif;
+                min-width: 32px;
+                min-height: 32px;
+            }
+            @media (max-width: 768px) {
+                #navigation .clown-group-heading > a { padding-right: 20px; }
+                #navigation .clown-submenu { margin: 0; }
+                #menu #navigation .clown-submenu a { padding-right: 8px; }
+                #clown-submenu-toggle { min-width: 44px; min-height: 44px; }
+            }
         </style>
     </head>
     <body>
@@ -120,8 +147,54 @@
             ga('create','UA-XXXXX-X','auto');ga('send','pageview');
         </script>
         <script>
-            document.getElementById('navigation').addEventListener('click', function (event) {
-                if (event.target.closest('a') && window.matchMedia('(max-width: 768px)').matches) {
+            const navigation = document.getElementById('navigation');
+            const clownPage = 'הליצן איקס';
+            const clownChildren = ['ממלכת שן הזהב התיכונה', 'הקונסוליה', 'יחידת ה104', 'שואו ריל הליצן איקס'];
+            let clownSubmenu;
+            let clownToggle;
+
+            function setClownSubmenu(open) {
+                clownSubmenu.hidden = !open;
+                clownToggle.textContent = open ? '−' : '+';
+                clownToggle.setAttribute('aria-expanded', String(open));
+                clownToggle.setAttribute('aria-label', open ? 'הסתרת עמודי הליצן איקס' : 'הצגת עמודי הליצן איקס');
+            }
+
+            function addClownSubmenu() {
+                const items = new Map(Array.from(navigation.children, item => [item.textContent.trim(), item]));
+                const parentItem = items.get(clownPage);
+                if (!parentItem || !clownChildren.every(label => items.has(label))) return;
+                menuObserver.disconnect();
+                const group = document.createElement('li');
+                clownSubmenu = document.createElement('ul');
+                clownSubmenu.className = 'clown-submenu';
+                clownSubmenu.id = 'clown-submenu';
+                group.appendChild(clownSubmenu);
+                parentItem.after(group);
+                clownChildren.forEach(label => clownSubmenu.appendChild(items.get(label)));
+                parentItem.classList.add('clown-group-heading');
+                clownToggle = document.createElement('button');
+                clownToggle.type = 'button';
+                clownToggle.id = 'clown-submenu-toggle';
+                clownToggle.setAttribute('aria-controls', clownSubmenu.id);
+                clownToggle.addEventListener('click', () => setClownSubmenu(clownSubmenu.hidden));
+                parentItem.appendChild(clownToggle);
+                const page = decodeURIComponent(location.hash.slice(1));
+                setClownSubmenu(page === clownPage || clownChildren.includes(page));
+            }
+
+            const menuObserver = new MutationObserver(addClownSubmenu);
+            menuObserver.observe(navigation, { childList: true });
+            addClownSubmenu();
+
+            navigation.addEventListener('click', function (event) {
+                const link = event.target.closest('a');
+                if (!link) return;
+                if (clownSubmenu && link.textContent.trim() === clownPage) {
+                    setClownSubmenu(true);
+                    return;
+                }
+                if (window.matchMedia('(max-width: 768px)').matches) {
                     this.style.display = '';
                     document.getElementById('menu').classList.remove('border');
                 }
